@@ -13,14 +13,28 @@ public final class jalopy extends TimerTask
     Timer timer = new Timer();
     TimerTask atask = new jalopy();
 
-    // make 3 entries to check for
-    // file => hash
-    filelist.put("cat", new String("cathash"));
-    filelist.put("dog", new String("doghash"));
-    filelist.put("mouse", new String("mousehash"));
-
+    grabfiles();
     System.out.println("Starting..");
     timer.schedule(atask, delay, period);
+  }
+
+  //prototype for a list of files to test in CWD
+  //should eventually just build list of what we need to check
+  //
+  //need to exclude everything but *.java
+  public static void grabfiles() {
+    File dir = new File(".");
+    
+    String[] children = dir.list();
+    if (children == null) {
+        // Either dir does not exist or is not a directory
+    } else {
+        for (int i=0; i<children.length; i++) {
+          String filename = children[i];
+          System.out.println("need to chk " + filename);
+          filelist.put(filename, new String("filehash"));
+        }
+    }
   }
 
   public void run()
@@ -31,19 +45,16 @@ public final class jalopy extends TimerTask
       for (Map.Entry<String, String> entry : filelist.entrySet()) {
         md5sum = getMD5Checksum(entry.getKey());
         if(md5sum.equals(entry.getValue())) {
-          System.out.println("No change");
         } else {
-          System.out.println("Changed!");
-          reruntest();
+          System.out.println("Checking...");
+          reruntest(entry.getKey());
           filelist.put(entry.getKey(), md5sum);
         }
-        //System.out.println(entry.getKey() + " => " + entry.getValue());
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
 
-    System.out.println("checking...");
   }
 
    public static byte[] createChecksum(String filename) throws
@@ -64,13 +75,15 @@ public final class jalopy extends TimerTask
      return complete.digest();
    }
 
-    public static void reruntest() {
+    public static void reruntest(String file) {
       // need to export our classpath before running this..
-      String cmd = "javac *.java && java org.junit.runner.JUnitCore Testhello";
+      String cmd = "javac *.java && java org.junit.runner.JUnitCore";
       Runtime run = Runtime.getRuntime();
       
       try {
-        System.out.println("got here");
+        System.out.println("running test on " + file);
+        cmd += " Test" + file;
+        System.out.println("running: " + cmd);
         Process pr = run.exec(cmd);
         pr.waitFor();
         BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
@@ -97,6 +110,9 @@ public final class jalopy extends TimerTask
      return result;
    }
 
+  // why do we have all this down here??? prob. cause I like to smoke crack
+  // every now and then -- that and my cat likes to sit right in front of my
+  // screen -- cunt..
   public static Map<String, String> filelist = new HashMap<String, String>();
   private static long delay = 1000;
   private static long period = 1000;

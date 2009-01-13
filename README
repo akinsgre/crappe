@@ -1,5 +1,9 @@
 Jalopy:
-  
+
+  NOTE:
+    apologies to users of jalopy as I was unaware of the documentation
+  system labeld this -- expect a name change very soon.
+
   I've never used java before as you can plainly see. However,
 now I need to learn and I wanted an autotest suite that was
 like what I used in ruby -- this presents problems as ruby
