@@ -1,7 +1,7 @@
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class Testjalopy {
+public class Testcrappe {
 
   @Test
   public void testoutput() {

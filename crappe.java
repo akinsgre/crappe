@@ -6,7 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.security.MessageDigest;
 
-public final class jalopy extends TimerTask
+public final class crappe extends TimerTask
 {
   public static boolean VERBOSE = false;
   public static String VERSION = "0.1";
@@ -15,17 +15,17 @@ public final class jalopy extends TimerTask
   public static void main(String args[])
   {
     Timer timer = new Timer();
-    TimerTask atask = new jalopy();
+    TimerTask atask = new crappe();
 
     for(String s: args) {
       if(s.equals("-version")) {
-        System.out.println("Jalopy Version " + VERSION);
+        System.out.println("crappe version " + VERSION);
         System.exit(0);
       } else if(s.equals("--verbose")) {
         VERBOSE = true;
         System.out.println("Running in Verbose Mode");
       } else if(s.equals("--help")) {
-        System.out.println("java ./jalopy [OPTIONS]\n" +
+        System.out.println("java ./crappe [OPTIONS]\n" +
                            "--help\t this help screen\n" +
                            "--verbose\t verbose mode\n" +
                            "--version\t Display version\n\n");
