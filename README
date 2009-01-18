@@ -1,28 +1,25 @@
 Jalopy:
 
   NOTE:
-    apologies to users of jalopy as I was unaware of the documentation
+  apologies to users of jalopy as I was unaware of the documentation
   system labeld this -- expect a name change very soon.
 
   I've never used java before as you can plainly see. However,
-now I need to learn and I wanted an autotest suite that was
-like what I used in ruby -- this presents problems as ruby
-is dynamic and java is a compiled language.
+  now I need to learn and I wanted an autotest suite that was
+  like what I used in ruby -- this presents problems as ruby
+  is dynamic and java is a compiled language.
 
-  Whatever, I don't give a rat's ass.
-
-to setup:
+SETUP:
 
   wget http://superb-east.dl.sourceforge.net/sourceforge/junit/junit-4.5.jar
   mv junit-4.5.jar ~/.
-  
-  export CLASSPATH=~/junit-4.5.jar:.;
-  javac *.java
 
-to test:
-  mv jalopy.class test/.
+  EDIT
+   jalopy.java and change Line 13 to whatever path you have that points
+   to junit-4.5.jar
+ 
+  javac -cp ~/junit-4.5.jar *.java
+
+TEST:
+  yes, it tests itself -- actually the tests have not been written yet. ;)
   java jalopy
-  java org.junit.runner.JUnitCore Testhello
-
-NOTES:
-  I use screen and whole-heartedly recommend everyone else also.

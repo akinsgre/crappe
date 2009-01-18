@@ -5,7 +5,7 @@ public class Testjalopy {
 
   @Test
   public void testoutput() {
-    System.out.println("yo");
+    System.out.println("new test");
   }
 
 }

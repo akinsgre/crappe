@@ -10,6 +10,7 @@ public final class jalopy extends TimerTask
 {
   public static boolean VERBOSE = false;
   public static String VERSION = "0.1";
+  public static String JUNIT  = "/home/cyn0n/";
 
   public static void main(String args[])
   {
@@ -49,7 +50,8 @@ public final class jalopy extends TimerTask
         for (int i=0; i<children.length; i++) {
           String filename = children[i];
 
-          if(filename.indexOf(".java") > 1) {
+          //ignore swap files
+          if((filename.indexOf(".java") > 1) && (filename.indexOf(".swp") == -1)){
             if(VERBOSE) {
               System.out.println("Tracking:" + filename);
             }
@@ -98,37 +100,50 @@ public final class jalopy extends TimerTask
 
     public static void reruntest(String file) {
       // need to export our classpath before running this..
-      String CP = "~/junit-4.5.jar";
-      String cmd = "javac -cp " + CP + " *.java && java -cp " + CP + ":. org.junit.runner.JUnitCore";
-      Runtime run = Runtime.getRuntime();
+      String CP = JUNIT + "junit-4.5.jar";
+      String cmd1 = "javac -cp " + CP + " " + file;
+      String cmd2 = "java -cp " + CP + ":. org.junit.runner.JUnitCore";
       String rfile = "";
 
+      //compile
+      runcmd(cmd1);
+
+      //run tests
+      rfile = file.replace(".java", "");
+      if(rfile.indexOf("Test") == 0) {
+        cmd2 += " " + rfile;
+      } else {
+        cmd2 += " Test" + rfile;
+      }
+ 
+      runcmd(cmd2);
+    }
+
+    public static void runcmd(String cmd) {
+      Runtime run = Runtime.getRuntime();
+ 
       try {
-        rfile = file.replace(".java", "");
-        
-        if(rfile.indexOf("Test") == 0) {
-          cmd += " " + rfile;
-        } else {
-          cmd += " Test" + rfile;
-        }
 
         if(VERBOSE) {
           System.out.println("Running: " + cmd);
         }
         Process pr = run.exec(cmd);
-        
+        pr.waitFor();
+
+        //stderr
+        //BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
+
+        //stdout 
         BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         String line = "";
 
-        System.out.println("get here"); 
         while ((line=buf.readLine())!=null) {
-          System.out.println("should get something");
           System.out.println(line);
         }
-        pr.waitFor();
-      } catch (Exception e) {
+
+     } catch (Exception e) {
         e.printStackTrace();
-      }
+     }
 
     }
 
