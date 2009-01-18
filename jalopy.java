@@ -121,7 +121,9 @@ public final class jalopy extends TimerTask
 
     public static void runcmd(String cmd) {
       Runtime run = Runtime.getRuntime();
- 
+      String colore = "";
+      String colorb = "";
+
       try {
 
         if(VERBOSE) {
@@ -138,7 +140,21 @@ public final class jalopy extends TimerTask
         String line = "";
 
         while ((line=buf.readLine())!=null) {
-          System.out.println(line);
+
+          colorb = "";
+          colore = "";
+          if(line.indexOf("OK") >= 0) {
+            colorb = "\033[1m\033[32m";
+            colore = "\033[0m";
+          }
+
+          if((line.indexOf("failure") >= 0) || 
+              (line.indexOf("FAILURE") >=0)) {
+            colorb = "\033[1m\033[31m";
+            colore = "\033[0m";
+          }
+
+        System.out.println(colorb + line + colore);
         }
 
      } catch (Exception e) {

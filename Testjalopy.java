@@ -8,4 +8,9 @@ public class Testjalopy {
     System.out.println("new test");
   }
 
+  @Test
+  public void testBad() {
+    assertEquals(1, 1);
+  }
+
 }

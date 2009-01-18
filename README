@@ -23,3 +23,9 @@ SETUP:
 TEST:
   yes, it tests itself -- actually the tests have not been written yet. ;)
   java jalopy
+
+  try editing Testjalopy.java and changing line 13 to:
+    assertEquals(1, 2);
+
+  now try changing it back to:
+    assertEquals(2, 2);
