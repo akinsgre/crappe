@@ -16,7 +16,7 @@ to setup:
   wget http://superb-east.dl.sourceforge.net/sourceforge/junit/junit-4.5.jar
   mv junit-4.5.jar ~/.
   
-  export CLASSPATH=~/junit-4.5.jar;
+  export CLASSPATH=~/junit-4.5.jar:.;
   javac *.java
 
 to test:

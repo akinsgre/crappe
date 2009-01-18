@@ -8,18 +8,35 @@ import java.security.MessageDigest;
 
 public final class jalopy extends TimerTask
 {
+  public static boolean VERBOSE = false;
+  public static String VERSION = "0.1";
+
   public static void main(String args[])
   {
     Timer timer = new Timer();
     TimerTask atask = new jalopy();
 
+    for(String s: args) {
+      if(s.equals("-version")) {
+        System.out.println("Jalopy Version " + VERSION);
+        System.exit(0);
+      } else if(s.equals("--verbose")) {
+        VERBOSE = true;
+        System.out.println("Running in Verbose Mode");
+      } else if(s.equals("--help")) {
+        System.out.println("java ./jalopy [OPTIONS]\n" +
+                           "--help\t this help screen\n" +
+                           "--verbose\t verbose mode\n" +
+                           "--version\t Display version\n\n");
+        System.exit(0);
+      }
+    }
+
     grabfiles();
-    System.out.println("Starting..");
     timer.schedule(atask, delay, period);
   }
 
   //prototype for a list of files to test in CWD
-  //should eventually just build list of what we need to check
   //
   //need to exclude everything but *.java
   public static void grabfiles() {
@@ -31,8 +48,13 @@ public final class jalopy extends TimerTask
     } else {
         for (int i=0; i<children.length; i++) {
           String filename = children[i];
-          System.out.println("need to chk " + filename);
-          filelist.put(filename, new String("filehash"));
+
+          if(filename.indexOf(".java") > 1) {
+            if(VERBOSE) {
+              System.out.println("Tracking:" + filename);
+            }
+            filelist.put(filename, new String("filehash"));
+          }
         }
     }
   }
@@ -46,7 +68,6 @@ public final class jalopy extends TimerTask
         md5sum = getMD5Checksum(entry.getKey());
         if(md5sum.equals(entry.getValue())) {
         } else {
-          System.out.println("Checking...");
           reruntest(entry.getKey());
           filelist.put(entry.getKey(), md5sum);
         }
@@ -77,27 +98,38 @@ public final class jalopy extends TimerTask
 
     public static void reruntest(String file) {
       // need to export our classpath before running this..
-      String cmd = "javac *.java && java org.junit.runner.JUnitCore";
+      String CP = "/home/cyn0n/junit-4.5.jar";
+      String cmd = "javac -cp " + CP + " *.java && java -cp " + CP + ":. org.junit.runner.JUnitCore";
       Runtime run = Runtime.getRuntime();
-      
+      String rfile = "";
+
       try {
-        System.out.println("running test on " + file);
-        cmd += " Test" + file;
-        System.out.println("running: " + cmd);
+        rfile = file.replace(".java", "");
+        
+        if(rfile.indexOf("Test") == 0) {
+          cmd += " " + rfile;
+        } else {
+          cmd += " Test" + rfile;
+        }
+
+        if(VERBOSE) {
+          System.out.println("Running: " + cmd);
+        }
         Process pr = run.exec(cmd);
-        pr.waitFor();
+        
         BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
         String line = "";
-       
+
         System.out.println("get here"); 
         while ((line=buf.readLine())!=null) {
+          System.out.println("should get something");
           System.out.println(line);
         }
+        pr.waitFor();
       } catch (Exception e) {
         e.printStackTrace();
       }
 
-      System.out.println("running tests again....");
     }
 
    public static String getMD5Checksum(String filename) throws Exception {
