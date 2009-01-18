@@ -98,7 +98,7 @@ public final class jalopy extends TimerTask
 
     public static void reruntest(String file) {
       // need to export our classpath before running this..
-      String CP = "/home/cyn0n/junit-4.5.jar";
+      String CP = "~/junit-4.5.jar";
       String cmd = "javac -cp " + CP + " *.java && java -cp " + CP + ":. org.junit.runner.JUnitCore";
       Runtime run = Runtime.getRuntime();
       String rfile = "";
