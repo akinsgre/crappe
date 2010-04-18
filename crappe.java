@@ -18,7 +18,7 @@ public final class crappe extends TimerTask
     TimerTask atask = new crappe();
 
     for(String s: args) {
-      if(s.equals("-version")) {
+      if(s.equals("--version")) {
         System.out.println("crappe version " + VERSION);
         System.exit(0);
       } else if(s.equals("--verbose")) {
