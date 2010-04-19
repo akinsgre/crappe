@@ -1,11 +1,3 @@
-/**
- Apache Ant
-   Copyright 1999-2010 The Apache Software Foundation
-
-   This product includes software developed by
-   The Apache Software Foundation (http://www.apache.org/).
- */
-
 import java.io.*;
 import java.util.Iterator;
 import java.util.*;
