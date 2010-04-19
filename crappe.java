@@ -1,3 +1,11 @@
+/**
+ Apache Ant
+   Copyright 1999-2010 The Apache Software Foundation
+
+   This product includes software developed by
+   The Apache Software Foundation (http://www.apache.org/).
+ */
+
 import java.io.*;
 import java.util.Iterator;
 import java.util.*;
@@ -5,6 +13,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.security.MessageDigest;
+import java.lang.reflect.Method;
 
 public final class crappe extends TimerTask
 {
@@ -112,13 +121,20 @@ public final class crappe extends TimerTask
     public static void reruntest(String file) {
 	// need to export our classpath before running this..
 	String CP = JUNIT + "junit-4.5.jar";
-	String cmd1 = "javac -cp " + CP + " " + file;
 	String cmd2 = "java -cp " + CP + ":. org.junit.runner.JUnitCore";
 	String rfile = "";
 
 	//compile
       
-	runcmd(cmd1);
+	try {
+	    boolean successful = compile(file);
+	    if (!successful) System.out.println("There was a problem compiling " + file);
+	}
+	catch(Exception ex) {
+	    System.out.println("Caught an exception while compiling  " + 
+			       file + ".\n" + ex.getMessage());
+	    ex.printStackTrace();
+	}
 
 	//run tests
 	rfile = file.replace(".java", "");
@@ -130,7 +146,25 @@ public final class crappe extends TimerTask
  
 	runcmd(cmd2);
     }
+    public static boolean compile(String filename) throws Exception
+    {
+	// Use reflection to be able to build on all JDKs >= 1.1:
+	System.out.println("Compiling " + filename);
+        try {
+            Class<?> c = Class.forName ("com.sun.tools.javac.Main");
+            Object compiler = c.newInstance ();
+            Method compile = c.getMethod ("compile",
+                 new Class [] {(new String [] {}).getClass ()});
+            int result = ((Integer) compile.invoke
+			  (compiler, new Object[] {new String[] {filename} }))
+                 .intValue ();
+	    if (VERBOSE) System.out.println("Compiling " + filename + " returned " + result);
+            return result == 0;
+        } catch (Exception ex) {
+	    throw ex;
+	}
 
+    }
     public static void runcmd(String cmd) {
 	Runtime run = Runtime.getRuntime();
 	String colore = "";
