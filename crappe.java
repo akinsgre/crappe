@@ -1,3 +1,11 @@
+/**
+ Apache Ant
+   Copyright 1999-2010 The Apache Software Foundation
+
+   This product includes software developed by
+   The Apache Software Foundation (http://www.apache.org/).
+ */
+
 import java.io.*;
 import java.util.Iterator;
 import java.util.*;
@@ -6,6 +14,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.security.MessageDigest;
 import java.lang.reflect.Method;
+import org.junit.runner.JUnitCore;
+
 
 public final class crappe extends TimerTask
 {
@@ -113,11 +123,9 @@ public final class crappe extends TimerTask
     public static void reruntest(String file) {
 	// need to export our classpath before running this..
 	String CP = JUNIT + "junit-4.5.jar";
-	String cmd2 = "java -cp " + CP + ":. org.junit.runner.JUnitCore";
+	String classname = "";
 	String rfile = "";
-
 	//compile
-      
 	try {
 	    boolean successful = compile(file);
 	    if (!successful) System.out.println("There was a problem compiling " + file);
@@ -130,14 +138,20 @@ public final class crappe extends TimerTask
 
 	//run tests
 	rfile = file.replace(".java", "");
+	rfile = rfile.replace(System.getProperty("scandir") + "/", "");
+	System.out.println("RFile = " + rfile);
 	if(rfile.indexOf("Test") == 0) {
-	    cmd2 += " " + rfile;
-	} else {
-	    cmd2 += " Test" + rfile;
+	    classname = rfile;
+	    try {
+		if (VERBOSE) System.out.println("Going to test " + classname);
+		runTest(Class.forName(classname));
+	    }
+	    catch (Exception ex) {
+		ex.printStackTrace();
+	    }
 	}
- 
-	runcmd(cmd2);
     }
+
     public static boolean compile(String filename) throws Exception
     {
 	// Use reflection to be able to build on all JDKs >= 1.1:
@@ -157,47 +171,40 @@ public final class crappe extends TimerTask
 	}
 
     }
-    public static void runcmd(String cmd) {
-	Runtime run = Runtime.getRuntime();
-	String colore = "";
-	String colorb = "";
+    public static void runTest(Class testClass) {
+    	Runtime run = Runtime.getRuntime();
+    	String colore = "";
+    	String colorb = "";
+    	String line = "Test Value";
+    	try {
 
-	try {
+    	    if(VERBOSE) {
+    		System.out.println("Running Tests in : " + testClass);
+    	    }
 
-	    if(VERBOSE) {
-		System.out.println("Running: " + cmd);
-	    }
-	    Process pr = run.exec(cmd);
-	    pr.waitFor();
+	    colorb = "";
+	    colore = "";
 
-	    //stderr
-	    //BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getErrorStream()));
+	    
+	    JUnitCore.main(testClass.getName());
 
-	    //stdout 
-	    BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-	    String line = "";
-
-	    while ((line=buf.readLine())!=null) {
-
-		colorb = "";
-		colore = "";
-		if(line.indexOf("OK") >= 0) {
-		    colorb = "\033[1m\033[32m";
-		    colore = "\033[0m";
-		}
-
-		if((line.indexOf("failure") >= 0) || 
-		   (line.indexOf("FAILURE") >=0)) {
-		    colorb = "\033[1m\033[31m";
-		    colore = "\033[0m";
-		}
-
-		System.out.println(colorb + line + colore);
+	    if(line.indexOf("OK") >= 0) {
+		colorb = "\033[1m\033[32m";
+		colore = "\033[0m";
 	    }
 
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
+	    if((line.indexOf("failure") >= 0) || 
+	       (line.indexOf("FAILURE") >=0)) {
+		colorb = "\033[1m\033[31m";
+		colore = "\033[0m";
+	    }
+
+	    System.out.println(colorb + line + colore);
+
+
+    	} catch (Exception e) {
+    	    e.printStackTrace();
+    	}
 
     }
 
