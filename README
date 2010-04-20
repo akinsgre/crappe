@@ -1,3 +1,7 @@
+4/19/2010 akinsgre
+I checked in some code that breaks because it can't find a class that isn't on 
+
+Easy fix.. but will wait until tomorrow ;-)
 crappe:
 
   I've never used java before as you can plainly see. However,
