@@ -1,11 +1,3 @@
-/**
- Apache Ant
-   Copyright 1999-2010 The Apache Software Foundation
-
-   This product includes software developed by
-   The Apache Software Foundation (http://www.apache.org/).
- */
-
 import java.io.*;
 import java.util.Iterator;
 import java.util.*;
@@ -15,6 +7,9 @@ import java.util.TimerTask;
 import java.security.MessageDigest;
 import java.lang.reflect.Method;
 import org.junit.runner.JUnitCore;
+import org.junit.runner.Result ; 
+import java.net.URLClassLoader;
+import java.net.URL;
 
 
 public final class crappe extends TimerTask
@@ -122,7 +117,6 @@ public final class crappe extends TimerTask
 
     public static void reruntest(String file) {
 	// need to export our classpath before running this..
-	String CP = JUNIT + "junit-4.5.jar";
 	String classname = "";
 	String rfile = "";
 	//compile
@@ -141,17 +135,31 @@ public final class crappe extends TimerTask
 	rfile = rfile.replace(System.getProperty("scandir") + "/", "");
 	System.out.println("RFile = " + rfile);
 	if(rfile.indexOf("Test") == 0) {
-	    classname = rfile;
+
 	    try {
-		if (VERBOSE) System.out.println("Going to test " + classname);
-		runTest(Class.forName(classname));
+		if (VERBOSE) System.out.println("Going to test " + rfile);
+		// Create a File object on the root of the directory containing the class file 
+		File afile = new File(System.getProperty("scandir"));
+		try { 
+		    // Convert File to a URL 
+		    URL url = afile.toURI().toURL(); 
+		    URL[] urls = new URL[]{url}; 
+		    // Create a new class loader with the directory 
+		    cl = new URLClassLoader(urls); 
+		    Class cls = cl.loadClass(rfile); 
+		    runTest(cls);
+		} 
+		catch (Exception e) {
+		    e.printStackTrace(); 
+		} 
+
 	    }
 	    catch (Exception ex) {
 		ex.printStackTrace();
 	    }
 	}
     }
-
+    static ClassLoader cl ; 
     public static boolean compile(String filename) throws Exception
     {
 	// Use reflection to be able to build on all JDKs >= 1.1:
@@ -185,16 +193,14 @@ public final class crappe extends TimerTask
 	    colorb = "";
 	    colore = "";
 
-	    
-	    JUnitCore.main(testClass.getName());
+	    JUnitCore core = new JUnitCore();
+	    Result result = core.run(testClass);
 
-	    if(line.indexOf("OK") >= 0) {
+	    if(result.wasSuccessful()) {
 		colorb = "\033[1m\033[32m";
 		colore = "\033[0m";
 	    }
-
-	    if((line.indexOf("failure") >= 0) || 
-	       (line.indexOf("FAILURE") >=0)) {
+	    else {
 		colorb = "\033[1m\033[31m";
 		colore = "\033[0m";
 	    }
