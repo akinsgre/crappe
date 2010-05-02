@@ -1,0 +1,27 @@
+<project name="Crappe">
+<path id="classpath">
+  <fileset dir="./lib">
+    <include name="*.jar"/>
+  </fileset>
+  <pathelement path="${build.dir}"/>
+</path>
+
+  <target name="build"> 
+    <delete dir="./build" />
+    <mkdir dir="./build" />
+    <javac srcdir="./src" destdir="./build" >
+      <classpath refid="classpath"/>
+    </javac>
+  </target>
+  <target name="jar" depends="build" >
+    <jar destfile="crappe.jar"
+         basedir="./build"
+         includes="**/*.class">
+      <manifest>
+        <attribute name="Main-Class" value="Crappe" />
+	<attribute name="Class-Path" value="lib/junit-4.8.2.jar" />
+      </manifest>
+    </jar>
+    
+  </target>
+</project>

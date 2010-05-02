@@ -16,8 +16,6 @@ public final class crappe extends TimerTask
 {
     public static boolean VERBOSE = false;
     public static String VERSION = "0.1";
-    public static String JUNIT  = "/home/cyn0n/";
-    
 
     public static Map<String, String> filelist = new HashMap<String, String>();
     private static long delay = 1000;
@@ -48,8 +46,6 @@ public final class crappe extends TimerTask
 	timer.schedule(atask, delay, period);
     }
     
-    //prototype for a list of files to test in CWD
-    //
     //need to exclude everything but *.java
     public static void grabfiles() {
 	String scandir = System.getProperty("scandir");
@@ -68,7 +64,6 @@ public final class crappe extends TimerTask
 		if((filename.indexOf(".java") > 1) && (filename.indexOf(".swp") == -1)){
 		    filename = scandir + "/"  + filename ;
 		    if(VERBOSE) {
-			
 			System.out.println("Tracking:" + filename);
 		    }
 		    filelist.put(filename, new String("filehash"));
@@ -134,6 +129,10 @@ public final class crappe extends TimerTask
 	rfile = file.replace(".java", "");
 	rfile = rfile.replace(System.getProperty("scandir") + "/", "");
 	System.out.println("RFile = " + rfile);
+
+	//TODO  There should be a better way of figuring out what the tests are..
+	//but Eclipse does the same thing.. it just executes everything that matches a pattern in the project
+	//Could probably do a better matcher?  Or specify the Dir instead of the pattern
 	if(rfile.indexOf("Test") == 0) {
 
 	    try {
@@ -204,7 +203,7 @@ public final class crappe extends TimerTask
 		colorb = "\033[1m\033[31m";
 		colore = "\033[0m";
 	    }
-
+	    //line = result. [getOutput?]
 	    System.out.println(colorb + line + colore);
 
 
