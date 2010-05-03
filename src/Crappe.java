@@ -53,8 +53,18 @@ public final class Crappe extends TimerTask
 	    }
 	}
 
-	grabfiles();
-
+	try {
+	    filelist = Crappe.listFilesAsMap(new File(System.getProperty("scandir")), 
+						new FilenameFilter() {
+						    public boolean accept(File f, String s) { 
+							return s.endsWith(".java"); 
+						    }
+						}, 
+					true);
+	}
+	catch (Exception ex) {
+	    
+	}	
 	timer.schedule(atask, delay, period);
     }
     public ClassLoader createClassLoader()
@@ -64,7 +74,7 @@ public final class Crappe extends TimerTask
 	File afile = new File(System.getProperty("scandir"));
 	File jfile = new File(System.getProperty("junitdir"));
 	File ifile = new File(System.getProperty("fileio"));
-	File cfile = new File(".");
+	File cfile = new File("/Users/gakins/Projects/jautotest/target/test-classes/");
 	try { 
 	    // Convert File to a URL 
 	    URL scanUrl = afile.toURI().toURL(); 
@@ -175,11 +185,13 @@ public final class Crappe extends TimerTask
 	
 	//TODO  There should be a better way of figuring out what the tests are..
 	//but Eclipse does the same thing.. it just executes everything that matches a pattern in the project
-	//Could probably do a better matcher?  Or specify the Dir instead of the pattern
-	if(rfile.indexOf("Test") == 0) {
+	//Could probably do a better matcher?  Or specify the Dir instead of the pattern'
+
+	if(rfile.contains("Test")) {
 	    try {
 		ClassLoader cl = this.createClassLoader();
-		    Class cls = cl.loadClass(rfile); 
+		
+		Class cls = cl.loadClass(rfile.replace("/", ".")); 
 		runTest(cls);
 	    }
 	    catch (Exception ex) {
@@ -201,7 +213,6 @@ public final class Crappe extends TimerTask
 	    File file = new File(filename);
 	    ClassLoader cl = this.createClassLoader();
 	    Class cls = cl.loadClass("org.apache.commons.io.FileUtils");
-	System.out.println("This far?");	 
 	    Method mainMethod = cls.getMethod("readFileToString", new Class[]{File.class});
 	    String source = (String)mainMethod.invoke(null, new Object[]{file});
 	    System.out.println(source);
@@ -218,6 +229,7 @@ public final class Crappe extends TimerTask
 	    OutputStreamWriter osw = new OutputStreamWriter( baos );
 	    List<String> optionList = new ArrayList<String>();
 	    optionList.addAll(Arrays.asList("-classpath",System.getProperty("junitdir")));
+	    optionList.addAll(Arrays.asList("-d",System.getProperty("testOutDir")));
 
 	    JavaCompiler.CompilationTask task = compiler.getTask(
 								 osw,
@@ -283,14 +295,67 @@ public final class Crappe extends TimerTask
 	return result;
 	
     }
+    
+    public static Map<String, String> listFilesAsMap(
+					  File directory,
+					  FilenameFilter filter,
+					  boolean recurse) throws IOException
+    {
+	Collection<File> files = listFiles(directory,
+					   filter, recurse);
+	//Java4: Collection files = listFiles(directory, filter, recurse);
+	Map<String, String> fileMap = new HashMap<String, String>();
+	for (File file : files) {
+	    System.out.println("Adding " + file.getCanonicalPath() );
+	    fileMap.put( file.getCanonicalPath(), new String("filehash"));
+	}
+	return fileMap ; 
+    }
+    
+    public static Collection<File> listFiles(
+					     // Java4: public static Collection listFiles(
+					     File directory,
+					     FilenameFilter filter,
+					     boolean recurse)
+    {
+	// List of files / directories
+	Vector<File> files = new Vector<File>();
+	// Java4: Vector files = new Vector();
+	
+	// Get files / directories in the directory
+	File[] entries = directory.listFiles();
+	
+	// Go over entries
+	for (File entry : entries)
+	    {
+		// Java4: for (int f = 0; f < files.length; f++) {
+		// Java4: 	File entry = (File) files[f];
+		
+		// If there is no filter or the filter accepts the 
+		// file / directory, add it to the list
+		if (filter == null || filter.accept(directory, entry.getName()))
+		    {
+			files.add(entry);
+		    }
+		
+		// If the file is a directory and the recurse flag
+		// is set, recurse into the directory
+		if (recurse && entry.isDirectory())
+		    {
+			files.addAll(listFiles(entry, filter, recurse));
+		    }
+	    }
+	
+	// Return collection of files
+	return files;		
+    }
 }
-
 /**
  * A file object used to represent source coming from a string.
  */
 class JavaSourceFromString extends SimpleJavaFileObject {
     /**
-     * The source code of this "file".
+     * The source code of this "file".`
      */
     final String code;
 	
@@ -309,4 +374,7 @@ class JavaSourceFromString extends SimpleJavaFileObject {
 	public CharSequence getCharContent(boolean ignoreEncodingErrors) {
 	return code;
     }
+
+
+
 }
