@@ -54,13 +54,20 @@ public final class Crappe extends TimerTask
 	}
 
 	try {
-	    filelist = Crappe.listFilesAsMap(new File(System.getProperty("scandir")), 
+	    filelist = Crappe.listFilesAsMap(new File(System.getProperty("testDir")), 
 						new FilenameFilter() {
 						    public boolean accept(File f, String s) { 
 							return s.endsWith(".java"); 
 						    }
 						}, 
 					true);
+	    filelist.putAll(Crappe.listFilesAsMap(new File(System.getProperty("srcDir")), 
+						new FilenameFilter() {
+						    public boolean accept(File f, String s) { 
+							return s.endsWith(".java"); 
+						    }
+						}, 
+						  true));
 	}
 	catch (Exception ex) {
 	    
@@ -71,21 +78,24 @@ public final class Crappe extends TimerTask
     {
 	ClassLoader cl = null;
 	// Create a File object on the root of the directory containing the class file 
-	File afile = new File(System.getProperty("scandir"));
+	File tfile = new File(System.getProperty("testDir"));
+	File sfile = new File(System.getProperty("srcDir"));
 	File jfile = new File(System.getProperty("junitdir"));
 	File ifile = new File(System.getProperty("fileio"));
 	File cfile = new File("/Users/gakins/Projects/jautotest/target/test-classes/");
 	try { 
 	    // Convert File to a URL 
-	    URL scanUrl = afile.toURI().toURL(); 
-	    System.out.println("Loading " + scanUrl.toString() + " into Classpath");
+	    URL testUrl = tfile.toURI().toURL(); 
+	    System.out.println("Loading " + testUrl.toString() + " into Classpath");
+	    URL srcUrl = sfile.toURI().toURL(); 
+	    System.out.println("Loading " + srcUrl.toString() + " into Classpath");
 	    URL junitUrl = jfile.toURI().toURL(); 
 	    System.out.println("Loading " + junitUrl.toString() + " into Classpath");
 	    URL fileioUrl = ifile.toURI().toURL(); 
 	    System.out.println("Loading " + fileioUrl.toString() + " into Classpath");
 	    URL curDirUrl = cfile.toURI().toURL(); 
 	    System.out.println("Loading " + curDirUrl.toString() + " into Classpath");
-	    URL[] urls = new URL[]{scanUrl, junitUrl, fileioUrl, curDirUrl}; 
+	    URL[] urls = new URL[]{testUrl, srcUrl, junitUrl, fileioUrl, curDirUrl}; 
 	    // Create a new class loader with the directory 
 	    cl = new URLClassLoader(urls);		    
 
@@ -96,32 +106,7 @@ public final class Crappe extends TimerTask
 	}
 	    return cl ; 
     }
-    //need to exclude everything but *.java
-    public static void grabfiles() {
-	String scandir = System.getProperty("scandir");
-	System.out.println("Scanning " + scandir);	
-	if (VERBOSE) System.out.println("Scanning directory " + scandir);
-	
-	File dir = new File(scandir);
-	
-	String[] children = dir.list();
-	if (children == null) {
-	    // Either dir does not exist or is not a directory
-	} else {
-	    for (int i=0; i<children.length; i++) {
-		String filename = children[i];
-		
-		//ignore swap files
-		if((filename.indexOf(".java") > 1) && (filename.indexOf(".swp") == -1)){
-		    filename = scandir + "/"  + filename ;
-		    if(VERBOSE) {
-			System.out.println("Tracking:" + filename);
-		    }
-		    filelist.put(filename, new String("filehash"));
-		}
-	    }
-	}
-    }
+
 
     public void run()
     {
@@ -180,7 +165,7 @@ public final class Crappe extends TimerTask
 	//run tests
 	rfile = file.replace(".java", "");
 
-	rfile = rfile.replace(System.getProperty("scandir") + "/", "");
+	rfile = rfile.replace(System.getProperty("testDir") + "/", "");
 	System.out.println("Running File = " + rfile);
 	
 	//TODO  There should be a better way of figuring out what the tests are..

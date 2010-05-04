@@ -1,3 +1,13 @@
+5/3/2010
+
+Command line (*nix) for launching Crappe
+
+java -Dfileio=lib/commons-io-1.4.jar -Djunitdir=lib/junit-4.8.2.jar -Dscandir=/Users/gakins/Projects/jautotest/src/test/java -DtestOutDir=/Users/gakins/Projects/jautotest/target/test-classes/ -jar crappe.jar --verbose
+
+Unfortunately, I realized how little progress I've made.  As I start using this against more complicated applications, the classloading to dynamically compile the tests seems like it's going to get more and more cumbersome.
+
+I'm not sure how much more I'll use this version.  I had hoped to continue using it while I created JAutoTest (Crappe 2.0).. but that seems like I might spend more time patching Crappe, than working on JAutoTest.
+
 4/19/2010 akinsgre
 I checked in some code that breaks because it can't find a class that isn't on 
 
